@@ -45,20 +45,19 @@ let test1 = data |> Seq.take 100 |> Seq.toArray    //view first 100 records to e
 let dataView = ctx.Data.LoadFromEnumerable(data)   //convert record seq to IDataView for ML consumption
 
 
-
 //view rating distributon
-let sampeData = readFile dataFiles.[0] |> Seq.toArray
-sampeData.Length
+let file1 = readFile dataFiles.[0] |> Seq.toArray
+file1.Length
 let rng = System.Random(1)
-let subSample = sampeData |> Array.filter(fun _ -> rng.NextDouble() < 0.001)
-subSample.Length
-let rankings = subSample |> Array.map (fun x->float x.Rating) |> Array.countBy (fun x->x)
+let viewSample = file1 |> Array.filter(fun _ -> rng.NextDouble() < 0.001)
+viewSample.Length
+let rankings = viewSample |> Array.map (fun x->float x.Rating) |> Array.countBy (fun x->x)
 open FSharp.Plotly
 Chart.Column rankings |> Chart.withTitle "Ratings density" |> Chart.Show
 
 //compare rating distributions over time
-let minDate = subSample |> Seq.map (fun x->x.Time) |> Seq.min
-subSample 
+let minDate = viewSample |> Seq.map (fun x->x.Time) |> Seq.min
+viewSample 
 |> Array.groupBy (fun x->x.Rating) 
 |> Array.map (fun (r,xs) -> 
     let xs = xs |> Array.sortBy (fun x->x.Time)

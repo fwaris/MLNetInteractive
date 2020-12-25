@@ -12,6 +12,18 @@ let dataFiles =  Directory.GetFiles(netflixDataFldr,"combined_data*.txt")
 
 dataFiles.[0] |> File.ReadLines |> Seq.take 10 |> Seq.toArray
 
+dataFiles.[0]
+|> File.ReadLines
+|> Seq.scan (fun st l -> if l.EndsWith(":") then Some l, None else fst st, Some l) (None,None)
+|> Seq.choose (function Some m, Some v -> Some (m,v) | _ -> None)
+|> Seq.take 10
+|> Seq.toArray
+
+
+
+
+
+
 //record to hold parsed required data
 type View = 
     {
