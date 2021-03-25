@@ -13,14 +13,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="MLUtils.fs" />
     <None Include="MLExplore.fsx" />
-    <Compile Include="Library1.fs" />
     <None Include="Packages.fsx" />
-    <None Include="ML.fsx" />
+    <None Include="sample_models\healthcare_anomaly.fsx" />
+    <None Include="sample_models\netflix_recommender.fsx" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ML" Version="1.5.2" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="1.5.5" />
+    <PackageReference Include="Microsoft.ML.AutoML" Version="0.17.5" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0-preview.2.21154.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.2-beta.21102.10" />
   </ItemGroup>
 </Project>

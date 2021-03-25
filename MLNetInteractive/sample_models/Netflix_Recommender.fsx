@@ -1,4 +1,4 @@
-﻿#load "Packages.fsx"
+﻿#load "../Packages.fsx"
 open Microsoft.ML
 open Microsoft.ML.Data
 open System.IO
@@ -8,6 +8,8 @@ open MathNet.Numerics.Statistics
 
 let ctx = MLContext()
 
+//dataset downloaded from here:
+//https://www.kaggle.com/netflix-inc/netflix-prize-data
 let netflixDataFldr = @"d:\s\ds\netflix"
 let dataFiles =  Directory.GetFiles(netflixDataFldr,"combined_data*.txt")
 
