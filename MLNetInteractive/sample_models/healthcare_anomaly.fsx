@@ -13,7 +13,7 @@ let ctx = MLContext()
 //dataset downloaded from here:
 //https://www.kaggle.com/tamilsel/healthcare-providers-data
 [<Literal>]
-let inputFile = @"C:\Users\fwaris\Downloads\Healthcare Providers.csv"
+let inputFile = @"D:\s\mlnetconf\Healthcare Providers.csv"
 
 type Thp = FSharp.Data.CsvProvider< inputFile>
 let thp = Thp.GetSample()
@@ -95,7 +95,7 @@ let dvTrain = txD.Fit(dv).Transform(dv)
 
 let topts = Trainers.RandomizedPcaTrainer.Options()
 topts.FeatureColumnName <- "Features"
-topts.Rank <- 2
+topts.Rank <- 3
 let trainer = ctx.AnomalyDetection.Trainers.RandomizedPca(topts)
 let mdl = trainer.Fit(dvTrain)
 let dvScore = mdl.Transform(dvTrain)
@@ -119,14 +119,25 @@ type TScore =
 
 let scores = ctx.Data.CreateEnumerable<TScore>(dvScore,false)
 
+let scoreChart t (xs:(float32*float32) seq) =
+    let maxX = xs |> Seq.map fst |> Seq.max
+    [
+        xs |> Chart.Point |> Chart.withTraceName "Data"
+        [0.0f,0.7f; maxX,0.7f] |> Chart.Line |> Chart.withTraceName "Threshold"
+    ]
+    |> Chart.Combine
+    |> Chart.withY_AxisStyle("Anomaly score")
+    |> Chart.withTitle t
+    |> Chart.Show
+    
 let rs = scores |> Seq.map (fun x->x.Score) |> Seq.toArray
-scores |> Seq.map(fun x -> x.``Number of Medicare Beneficiaries``,x.Score) |> Chart.Point |> Chart.withTitle "Number of Medicare Beneficiaries" |> Chart.Show
-scores |> Seq.map(fun x -> x.``Average Medicare Allowed Amount``,x.Score) |> Chart.Point |> Chart.withTitle "Average Medicare Allowed Amount" |> Chart.Show
-scores |> Seq.map(fun x -> x.``Average Medicare Standardized Amount``,x.Score) |> Chart.Point |> Chart.withTitle "Average Medicare Standardized Amount" |> Chart.Show
-scores |> Seq.map(fun x -> x.``Average Medicare Payment Amount``,x.Score) |> Chart.Point |> Chart.withTitle "Average Medicare Payment Amount" |> Chart.Show
-scores |> Seq.map(fun x -> x.``Number of Distinct Medicare Beneficiary/Per Day Services``,x.Score) |> Chart.Point |> Chart.withTitle "Number of Distinct Medicare Beneficiary/Per Day Services" |> Chart.Show
-scores |> Seq.map(fun x -> x.``Average Submitted Charge Amount``,x.Score) |> Chart.Point |> Chart.withTitle "Average Submitted Charge Amount"|> Chart.Show
-scores |> Seq.map(fun x -> x.``Number of Services``,x.Score) |> Chart.Point |> Chart.withTitle "Average Submitted Charge Amount" |> Chart.Show
+
+scores |> Seq.map(fun x -> x.``Number of Distinct Medicare Beneficiary/Per Day Services``,x.Score) |> scoreChart "Number of Distinct Medicare Beneficiary/Per Day Services"
+scores |> Seq.map(fun x -> x.``Number of Services``,x.Score) |> scoreChart "Average Submitted Charge Amount" 
+scores |> Seq.map(fun x -> x.``Average Medicare Allowed Amount``,x.Score) |> scoreChart "Average Medicare Allowed Amount" 
+scores |> Seq.map(fun x -> x.``Average Medicare Standardized Amount``,x.Score) |> scoreChart "Average Medicare Standardized Amount" 
+scores |> Seq.map(fun x -> x.``Average Medicare Payment Amount``,x.Score) |> scoreChart "Average Medicare Payment Amount" 
+scores |> Seq.map(fun x -> x.``Average Submitted Charge Amount``,x.Score) |>  scoreChart "Average Submitted Charge Amount"
 
 
 let highAnomaly = scores |> Seq.filter (fun x -> x.Score > 0.8f) |> Seq.toArray
